@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>MatchTracker</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: sans-serif;
+      background-color: #222;
+      color: #fff;
+      padding: 20px;
+      gap: 30px;
+    }
+
+    /* 表示領域 */
+    #display-area {
+      background-color: #00FF00; /* 黄緑背景 */
+      color: white;
+      font-size: 30pt;
+      font-weight: bold;
+      padding: 20px;
+      padding-left: 50px;
+      width: 400px;
+      text-shadow: -1px -1px 0 #000, 1px -1px 0 #000,
+                   -1px  1px 0 #000, 1px  1px 0 #000;
+      border-radius: 10px;
+    }
+
+    /* 操作領域 */
+    #control-panel {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 400px;
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
+    }
+
+    label {
+      min-width: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 表示領域 -->
+  <div id="display-area">
+    0戦 0勝 0敗
+  </div>
+
+  <!-- 操作領域 -->
+  <div id="control-panel">
+    <div class="input-group">
+      <label>勝ち:</label>
+      <button onclick="changeCount('win', 1)">＋</button>
+      <input id="winInput" type="number" value="0" min="0" oninput="updateDisplay()" />
+      <button onclick="changeCount('win', -1)">－</button>
+    </div>
+
+    <div class="input-group">
+      <label>負け:</label>
+      <button onclick="changeCount('lose', 1)">＋</button>
+      <input id="loseInput" type="number" value="0" min="0" oninput="updateDisplay()" />
+      <button onclick="changeCount('lose', -1)">－</button>
+    </div>
+
+    <div class="input-group">
+      <label>KO数:</label>
+      <button onclick="changeCount('ko', 1)">＋</button>
+      <input id="koInput" type="number" value="0" min="0" oninput="updateDisplay()" />
+      <button onclick="changeCount('ko', -1)">－</button>
+    </div>
+
+    <div class="input-group">
+      <label>KO表示:</label>
+      <input type="checkbox" id="toggleKO" onchange="updateDisplay()" />
+    </div>
+
+    <div class="input-group">
+      <label>KO数 加算:</label>
+      <input type="number" id="koAddValue" value="1" />
+      <button onclick="addKO()">加算</button>
+    </div>
+  </div>
+
+  <script>
+    function changeCount(type, delta) {
+      const input = document.getElementById(type + 'Input');
+      let value = parseInt(input.value) || 0;
+      value = Math.max(0, value + delta);
+      input.value = value;
+      updateDisplay();
+    }
+
+    function addKO() {
+      const addValue = parseInt(document.getElementById('koAddValue').value) || 0;
+      const input = document.getElementById('koInput');
+      input.value = Math.max(0, parseInt(input.value) || 0) + addValue;
+      updateDisplay();
+    }
+
+    function updateDisplay() {
+      const win = parseInt(document.getElementById('winInput').value) || 0;
+      const lose = parseInt(document.getElementById('loseInput').value) || 0;
+      const ko = parseInt(document.getElementById('koInput').value) || 0;
+      const showKO = document.getElementById('toggleKO').checked;
+
+      const total = win + lose;
+      let text = `${total}戦 ${win}勝 ${lose}敗`;
+      if (showKO) {
+        text += ` ${ko}KO`;
+      }
+
+      document.getElementById('display-area').textContent = text;
+    }
+  </script>
+
+</body>
+</html>
