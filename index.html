@@ -39,7 +39,7 @@
       max-width: 400px;
     }
 
-    .input-group {
+    .input-group,.input-goal-group {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -102,12 +102,16 @@
     </div>
     <div class="input-group" id="goalInputGroup" style="display: none;">
       <label>目標種類:</label>
-      <select id="goalType" onchange="updateDisplay()">
+      <select id="goalType" onchange="selectGoalType(); updateDisplay();">
         <option value="win">勝利目標</option>
         <option value="ko">KO目標</option>
       </select>
+    </div>
+    <div class="input-group" id="goalInputGroup2" style="display: none;">
       <label id="goalLabel" for="goalInput">勝利目標:</label>
+      <button onclick="changeCount('goal', 1)">＋</button>
       <input type="number" id="goalInput" value="10" min="1" oninput="updateDisplay()" />
+      <button onclick="changeCount('goal', -1)">－</button>
     </div>
   </div>
 
@@ -130,6 +134,19 @@
     function toggleGoalInput() {
       const checked = document.getElementById('toggleGoal').checked;
       document.getElementById('goalInputGroup').style.display = checked ? 'flex' : 'none';
+      document.getElementById('goalInputGroup2').style.display = checked ? 'flex' : 'none';
+    }
+
+    function selectGoalType() {
+      const goalType = document.getElementById('goalType').value;
+      const goalLabel = document.getElementById('goalLabel');
+      if (goalType === "win") {
+        goalLabel.textContent = "勝利目標:";
+        document.getElementById('toggleKO').checked = false;
+      } else if (goalType === "ko") {
+        goalLabel.textContent = "KO目標:";
+        document.getElementById('toggleKO').checked = true;
+      }
     }
 
     function updateDisplay() {
@@ -151,15 +168,9 @@
         const goal = parseInt(goalInput.value) || 0;
         let remain = 0;
         if (goalType === "win") {
-          goalLabel.textContent = "勝利目標:";
           remain = Math.max(0, goal - win);
           text += ` / 目標${goal}勝 (あと${remain}勝)`;
         } else if (goalType === "ko") {
-          if(!showKO){
-            text += ` ${ko}KO`;
-            document.getElementById('toggleKO').checked = true; // KO表示を強制的にオンにする
-          }
-          goalLabel.textContent = "KO目標:";
           remain = Math.max(0, goal - ko);
           text += ` / 目標${goal}KO (あと${remain}KO)`;
         }
