@@ -22,7 +22,7 @@
       font-weight: bold;
       padding: 20px;
       padding-left: 50px;
-      width: 400px;
+      width: 800px;
       text-shadow: -1px -1px 0 #000, 1px -1px 0 #000,
                    -1px  1px 0 #000, 1px  1px 0 #000;
       border-radius: 10px;
@@ -95,6 +95,20 @@
       <input type="number" id="koAddValue" value="1" />
       <button onclick="addKO()">加算</button>
     </div>
+
+    <div class="input-group">
+      <label>目標表示:</label>
+      <input type="checkbox" id="toggleGoal" onchange="toggleGoalInput(); updateDisplay();" />
+    </div>
+    <div class="input-group" id="goalInputGroup" style="display: none;">
+      <label>目標種類:</label>
+      <select id="goalType" onchange="updateDisplay()">
+        <option value="win">勝利目標</option>
+        <option value="ko">KO目標</option>
+      </select>
+      <label id="goalLabel" for="goalInput">勝利目標:</label>
+      <input type="number" id="goalInput" value="10" min="1" oninput="updateDisplay()" />
+    </div>
   </div>
 
   <script>
@@ -113,21 +127,52 @@
       updateDisplay();
     }
 
+    function toggleGoalInput() {
+      const checked = document.getElementById('toggleGoal').checked;
+      document.getElementById('goalInputGroup').style.display = checked ? 'flex' : 'none';
+    }
+
     function updateDisplay() {
       const win = parseInt(document.getElementById('winInput').value) || 0;
       const lose = parseInt(document.getElementById('loseInput').value) || 0;
       const ko = parseInt(document.getElementById('koInput').value) || 0;
       const showKO = document.getElementById('toggleKO').checked;
+      const showGoal = document.getElementById('toggleGoal').checked;
+      const goalType = document.getElementById('goalType') ? document.getElementById('goalType').value : "win";
+      const goalInput = document.getElementById('goalInput');
+      const goalLabel = document.getElementById('goalLabel');
+      let text = `${win + lose}戦 ${win}勝 ${lose}敗`;
 
-      const total = win + lose;
-      let text = `${total}戦 ${win}勝 ${lose}敗`;
       if (showKO) {
         text += ` ${ko}KO`;
       }
 
+      if (showGoal) {
+        const goal = parseInt(goalInput.value) || 0;
+        let remain = 0;
+        if (goalType === "win") {
+          goalLabel.textContent = "勝利目標:";
+          remain = Math.max(0, goal - win);
+          text += ` / 目標${goal}勝 (あと${remain}勝)`;
+        } else if (goalType === "ko") {
+          if(!showKO){
+            text += ` ${ko}KO`;
+            document.getElementById('toggleKO').checked = true; // KO表示を強制的にオンにする
+          }
+          goalLabel.textContent = "KO目標:";
+          remain = Math.max(0, goal - ko);
+          text += ` / 目標${goal}KO (あと${remain}KO)`;
+        }
+      }
+
       document.getElementById('display-area').textContent = text;
     }
-  </script>
 
+    // 初期化
+    window.onload = function() {
+      updateDisplay();
+      toggleGoalInput();
+    };
+  </script>
 </body>
 </html>
